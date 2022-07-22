@@ -33,7 +33,7 @@ public class ItemService {
             item.setId(id);
         }
         Item oldItem = itemStorage.getItemById(item.getId());
-        if (oldItem.getOwnerId() != item.getOwnerId()) {
+        if (!oldItem.getOwnerId().equals(item.getOwnerId())) {
             throw new ItemNotFoundException("У пользователя нет такой вещи!");
         }
         return itemStorage.update(item);
@@ -41,7 +41,7 @@ public class ItemService {
 
     public Item delete(Long itemId, Long ownerId) {
         Item item = itemStorage.getItemById(itemId);
-        if (item.getOwnerId() != ownerId) {
+        if (!item.getOwnerId().equals(ownerId)) {
             throw new ItemNotFoundException("У пользователя нет такой вещи!");
         }
         return itemStorage.delete(itemId);

@@ -56,7 +56,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
         if (users.values().stream()
                 .filter(u -> u.getEmail().equals(user.getEmail()))
-                .allMatch(u -> u.getId() == user.getId())) {
+                .allMatch(u -> u.getId().equals(user.getId()))) {
             if (isValidUser(user)) {
                 users.put(user.getId(), user);
             }
