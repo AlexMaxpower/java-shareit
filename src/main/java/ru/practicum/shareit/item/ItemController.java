@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toList;
 @RestController
 @RequestMapping("/items")
 public class ItemController {
-    private final String OWNER = "X-Sharer-User-Id";
+    private static final String OWNER = "X-Sharer-User-Id";
     private ItemService itemService;
     private ItemMapper mapper;
     private CheckConsistencyService checker;

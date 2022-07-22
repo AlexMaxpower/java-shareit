@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.UserAlreadyExistsException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
