@@ -4,56 +4,64 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class ItemService {
     private ItemStorage itemStorage;
+    private ItemMapper mapper;
 
     @Autowired
-    public ItemService(@Qualifier("InMemoryItemStorage") ItemStorage itemStorage) {
+    public ItemService(@Qualifier("InMemoryItemStorage") ItemStorage itemStorage, ItemMapper itemMapper) {
         this.itemStorage = itemStorage;
+        this.mapper = itemMapper;
     }
 
-    public Item create(Item item) {
-        return itemStorage.create(item);
+    public ItemDto create(ItemDto itemDto, Long ownerId) {
+        return mapper.toItemDto(itemStorage.create(mapper.toItem(itemDto, ownerId)));
     }
 
-    public List<Item> getItemsByOwner(Long ownderId) {
-        return itemStorage.getItemsByOwner(ownderId);
+    public List<ItemDto> getItemsByOwner(Long ownderId) {
+        return itemStorage.getItemsByOwner(ownderId).stream()
+                .map(mapper::toItemDto)
+                .collect(toList());
     }
 
-    public Item getItemById(Long id) {
-        return itemStorage.getItemById(id);
+    public ItemDto getItemById(Long id) {
+        return mapper.toItemDto(itemStorage.getItemById(id));
     }
 
-    public Item update(Item item, Long id) {
-        if (item.getId() == null) {
-            item.setId(id);
+    public ItemDto update(ItemDto itemDto, Long ownerId, Long itemId) {
+        if (itemDto.getId() == null) {
+            itemDto.setId(itemId);
         }
-        Item oldItem = itemStorage.getItemById(item.getId());
-        if (!oldItem.getOwnerId().equals(item.getOwnerId())) {
+        Item oldItem = itemStorage.getItemById(itemId);
+        if (!oldItem.getOwnerId().equals(ownerId)) {
             throw new ItemNotFoundException("У пользователя нет такой вещи!");
         }
-        return itemStorage.update(item);
+        return mapper.toItemDto(itemStorage.update(mapper.toItem(itemDto, ownerId)));
     }
 
-    public Item delete(Long itemId, Long ownerId) {
+    public ItemDto delete(Long itemId, Long ownerId) {
         Item item = itemStorage.getItemById(itemId);
         if (!item.getOwnerId().equals(ownerId)) {
             throw new ItemNotFoundException("У пользователя нет такой вещи!");
         }
-        return itemStorage.delete(itemId);
+        return mapper.toItemDto(itemStorage.delete(itemId));
     }
 
     public void deleteItemsByOwner(Long ownderId) {
         itemStorage.deleteItemsByOwner(ownderId);
     }
 
-    public List<Item> getItemsBySearchQuery(String text) {
+    public List<ItemDto> getItemsBySearchQuery(String text) {
         text = text.toLowerCase();
-        return itemStorage.getItemsBySearchQuery(text);
+        return itemStorage.getItemsBySearchQuery(text).stream()
+                .map(mapper::toItemDto)
+                .collect(toList());
     }
-
 }
