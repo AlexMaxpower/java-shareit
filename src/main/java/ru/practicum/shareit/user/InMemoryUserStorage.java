@@ -31,7 +31,10 @@ public class InMemoryUserStorage implements UserStorage {
     public User create(User user) {
         if (users.values().stream().noneMatch(u -> u.getEmail().equals(user.getEmail()))) {
             if (isValidUser(user)) {
-                user.setId(++currentId);
+           //     user.setId(++currentId);
+                if (user.getId() == null) {
+                    user.setId(++currentId);
+                }
                 users.put(user.getId(), user);
             }
         } else {

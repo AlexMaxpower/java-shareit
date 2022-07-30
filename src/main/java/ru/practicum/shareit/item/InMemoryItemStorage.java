@@ -76,7 +76,7 @@ public class InMemoryItemStorage implements ItemStorage {
     public void deleteItemsByOwner(Long ownerId) {
         List<Long> deleteIds = new ArrayList<>(items.values().stream()
                 .filter(item -> item.getOwnerId().equals(ownerId))
-                .map(item -> item.getOwnerId())
+                .map(item -> item.getId())
                 .collect(toList()));
         for (Long deleteId : deleteIds) {
             items.remove(deleteId);
