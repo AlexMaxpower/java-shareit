@@ -23,8 +23,8 @@ import static java.util.stream.Collectors.toList;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository repository;
     private final CommentRepository commentRepository;
-    private CheckConsistencyService checker;
-    private ItemMapper mapper;
+    private final CheckConsistencyService checker;
+    private final ItemMapper mapper;
 
     @Autowired
     @Lazy
@@ -57,11 +57,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto create(ItemDto itemDto, Long ownerId) {
+        checker.isExistUser(ownerId);
         return mapper.toItemDto(repository.save(mapper.toItem(itemDto, ownerId)));
     }
 
     @Override
     public List<ItemDto> getItemsByOwner(Long ownerId) {
+        checker.isExistUser(ownerId);
         return repository.findByOwnerId(ownerId).stream()
                 .map(mapper::toItemExtDto)
                 .sorted(Comparator.comparing(ItemDto::getId))
@@ -94,6 +96,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto update(ItemDto itemDto, Long ownerId, Long itemId) {
+        checker.isExistUser(ownerId);
         Item item = repository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Вещь с ID=" + itemId + " не найдена!"));
         if (!item.getOwner().getId().equals(ownerId)) {
@@ -113,6 +116,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto createComment(CommentDto commentDto, Long itemId, Long userId) {
+        checker.isExistUser(userId);
         Comment comment = new Comment();
         Booking booking = checker.getBookingWithUserBookedItem(itemId, userId);
         if (booking != null) {

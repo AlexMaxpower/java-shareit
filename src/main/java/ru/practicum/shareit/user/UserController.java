@@ -13,13 +13,11 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users")
 public class UserController {
-    private UserService userService;
-    private CheckConsistencyService checker;
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService, CheckConsistencyService checkConsistencyService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.checker = checkConsistencyService;
     }
 
     @GetMapping
