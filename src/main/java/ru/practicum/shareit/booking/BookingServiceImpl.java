@@ -45,7 +45,7 @@ public class BookingServiceImpl implements BookingService {
                     " недоступна для бронирования!");
         }
         Booking booking = mapper.toBooking(bookingInputDto, bookerId);
-        if (bookerId == booking.getItem().getOwner().getId()) {
+        if (bookerId.equals(booking.getItem().getOwner().getId())) {
             throw new BookingNotFoundException("Вещь с ID=" + bookingInputDto.getItemId() +
                     " недоступна для бронирования самим владельцем!");
         }

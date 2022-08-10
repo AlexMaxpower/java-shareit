@@ -41,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
         ItemDto itemDto;
         Item item = repository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Вещь с ID=" + id + " не найдена!"));
-        if (userId == item.getOwner().getId()) {
+        if (userId.equals(item.getOwner().getId())) {
             itemDto = mapper.toItemExtDto(item);
         } else {
             itemDto = mapper.toItemDto(item);
