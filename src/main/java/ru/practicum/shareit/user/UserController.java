@@ -47,10 +47,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public UserDto delete(@PathVariable Long userId) {
+    public void delete(@PathVariable Long userId) {
         log.info("Получен DELETE-запрос к эндпоинту: '/users' на удаление пользователя с ID={}", userId);
-        UserDto userDto = userService.delete(userId);
-        checker.deleteItemsByUser(userId);
-        return userDto;
+        userService.delete(userId);
     }
 }

@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.service.CheckConsistencyService;
 
@@ -15,7 +16,6 @@ import java.util.List;
 public class ItemController {
     private static final String OWNER = "X-Sharer-User-Id";
     private ItemService itemService;
-
     private CheckConsistencyService checker;
 
     @Autowired
@@ -25,9 +25,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
+    public ItemDto getItemById(@PathVariable Long itemId, @RequestHeader(OWNER) Long ownerId) {
         log.info("Получен GET-запрос к эндпоинту: '/items' на получение вещи с ID={}", itemId);
-        return itemService.getItemById(itemId);
+        return itemService.getItemById(itemId, ownerId);
     }
 
     @ResponseBody
@@ -44,7 +44,8 @@ public class ItemController {
     @GetMapping
     public List<ItemDto> getItemsByOwner(@RequestHeader(OWNER) Long ownerId) {
         log.info("Получен GET-запрос к эндпоинту: '/items' на получение всех вещей владельца с ID={}", ownerId);
-        return itemService.getItemsByOwner(ownerId);
+        checker.isExistUser(ownerId);
+       return itemService.getItemsByOwner(ownerId);
     }
 
     @ResponseBody
@@ -60,9 +61,9 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    public ItemDto delete(@PathVariable Long itemId, @RequestHeader(OWNER) Long ownerId) {
+    public void delete(@PathVariable Long itemId, @RequestHeader(OWNER) Long ownerId) {
         log.info("Получен DELETE-запрос к эндпоинту: '/items' на удаление вещи с ID={}", itemId);
-        return itemService.delete(itemId, ownerId);
+        itemService.delete(itemId, ownerId);
     }
 
     @GetMapping("/search")
@@ -70,4 +71,17 @@ public class ItemController {
         log.info("Получен GET-запрос к эндпоинту: '/items/search' на поиск вещи с текстом={}", text);
         return itemService.getItemsBySearchQuery(text);
     }
+
+   @ResponseBody
+   @PostMapping("/{itemId}/comment")
+   public CommentDto createComment(@Valid @RequestBody CommentDto commentDto, @RequestHeader(OWNER) Long userId,
+                            @PathVariable Long itemId) {
+       log.info("Получен POST-запрос к эндпоинту: '/items/comment' на" +
+               " добавление отзыва пользователем с ID={}", userId);
+       CommentDto newCommentDto = null;
+       if (checker.isExistUser(userId)) {
+           newCommentDto = itemService.createComment(commentDto, itemId, userId);
+       }
+       return newCommentDto;
+   }
 }
