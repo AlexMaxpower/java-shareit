@@ -57,7 +57,7 @@ public class UserDtoTest {
         userDto.setName(" ");
         Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
         assertThat(violations).isNotEmpty();
-        assertThat(violations.toString()).contains("interpolatedMessage='не должно быть пустым', propertyPath=name");
+        assertThat(violations.toString()).contains("interpolatedMessage='must not be blank'");
     }
 
     @Test
