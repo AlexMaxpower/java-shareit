@@ -35,9 +35,11 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByOwner(@RequestHeader(OWNER) Long ownerId) {
+    public List<ItemDto> getItemsByOwner(@RequestHeader(OWNER) Long ownerId,
+                                         @RequestParam(defaultValue = "0") Integer from,
+                                         @RequestParam(required = false) Integer size) {
         log.info("Получен GET-запрос к эндпоинту: '/items' на получение всех вещей владельца с ID={}", ownerId);
-        return itemService.getItemsByOwner(ownerId);
+        return itemService.getItemsByOwner(ownerId, from, size);
     }
 
     @ResponseBody
@@ -55,9 +57,11 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItemsBySearchQuery(@RequestParam String text) {
+    public List<ItemDto> getItemsBySearchQuery(@RequestParam String text,
+                                               @RequestParam(defaultValue = "0") Integer from,
+                                               @RequestParam(required = false) Integer size) {
         log.info("Получен GET-запрос к эндпоинту: '/items/search' на поиск вещи с текстом={}", text);
-        return itemService.getItemsBySearchQuery(text);
+        return itemService.getItemsBySearchQuery(text, from, size);
     }
 
     @ResponseBody

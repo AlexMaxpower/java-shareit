@@ -2,7 +2,9 @@ package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
@@ -11,10 +13,10 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.service.CheckConsistencyService;
+import ru.practicum.shareit.util.Pagination;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -62,36 +64,82 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsByOwner(Long ownerId) {
+    public List<ItemDto> getItemsByOwner(Long ownerId, Integer from, Integer size) {
         checker.isExistUser(ownerId);
-        return repository.findByOwnerId(ownerId).stream()
-                .map(mapper::toItemExtDto)
-                .sorted(Comparator.comparing(ItemDto::getId))
-                .collect(toList());
+        List<ItemDto> listItemExtDto = new ArrayList<>();
+        Pageable pageable;
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        Page<Item> page;
+        Pagination pager = new Pagination(from, size);
+
+
+        if (size == null) {
+            pageable =
+                    PageRequest.of(pager.getIndex(), pager.getPageSize(), sort);
+            do {
+                page = repository.findByOwnerId(ownerId, pageable);
+                listItemExtDto.addAll(page.stream().map(mapper::toItemExtDto).collect(toList()));
+                pageable = pageable.next();
+            } while (page.hasNext());
+
+        } else {
+            for (int i = pager.getIndex(); i < pager.getTotalPages(); i++) {
+                pageable =
+                        PageRequest.of(i, pager.getPageSize(), sort);
+                page = repository.findByOwnerId(ownerId, pageable);
+                listItemExtDto.addAll(page.stream().map(mapper::toItemExtDto).collect(toList()));
+                if (!page.hasNext()) {
+                    break;
+                }
+            }
+            listItemExtDto = listItemExtDto.stream().limit(size).collect(toList());
+        }
+        return listItemExtDto;
     }
 
     @Override
     public void delete(Long itemId, Long ownerId) {
-        try {
             Item item = repository.findById(itemId)
                     .orElseThrow(() -> new ItemNotFoundException("Вещь с ID=" + itemId + " не найдена!"));
             if (!item.getOwner().getId().equals(ownerId)) {
                 throw new ItemNotFoundException("У пользователя нет такой вещи!");
             }
             repository.deleteById(itemId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new ItemNotFoundException("Вещь с ID=" + itemId + " не найдена!");
-        }
     }
 
     @Override
-    public List<ItemDto> getItemsBySearchQuery(String text) {
+    public List<ItemDto> getItemsBySearchQuery(String text, Integer from, Integer size) {
+        List<ItemDto> listItemDto = new ArrayList<>();
         if ((text != null) && (!text.isEmpty()) && (!text.isBlank())) {
             text = text.toLowerCase();
-            return repository.getItemsBySearchQuery(text).stream()
-                    .map(mapper::toItemDto)
-                    .collect(toList());
-        } else return new ArrayList<>();
+            Pageable pageable;
+            Sort sort = Sort.by(Sort.Direction.ASC, "name");
+            Page<Item> page;
+            Pagination pager = new Pagination(from, size);
+
+            if (size == null) {
+                pageable =
+                        PageRequest.of(pager.getIndex(), pager.getPageSize(), sort);
+                do {
+                    page = repository.getItemsBySearchQuery(text, pageable);
+                    listItemDto.addAll(page.stream().map(mapper::toItemDto).collect(toList()));
+                    pageable = pageable.next();
+                } while (page.hasNext());
+
+            } else {
+                for (int i = pager.getIndex(); i < pager.getTotalPages(); i++) {
+                    pageable =
+                            PageRequest.of(i, pager.getPageSize(), sort);
+                    page = repository.getItemsBySearchQuery(text, pageable);
+                    listItemDto.addAll(page.stream().map(mapper::toItemDto).collect(toList()));
+                    if (!page.hasNext()) {
+                        break;
+                    }
+                }
+                listItemDto = listItemDto.stream().limit(size).collect(toList());
+            }
+        }
+        return listItemDto;
     }
 
     @Override
@@ -132,9 +180,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<CommentDto> getCommentsByItemId(Long itemId) {
-        return commentRepository.findAllByItem_Id(itemId,
+        return commentRepository.findAllByItemId(itemId,
                         Sort.by(Sort.Direction.DESC, "created")).stream()
                 .map(mapper::toCommentDto)
+                .collect(toList());
+    }
+
+    @Override
+    public List<ItemDto> getItemsByRequestId(Long requestId) {
+        return repository.findAllByRequestId(requestId,
+                        Sort.by(Sort.Direction.DESC, "id")).stream()
+                .map(mapper::toItemDto)
                 .collect(toList());
     }
 }

@@ -46,17 +46,21 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getBookings(@RequestParam(name = "state", defaultValue = "ALL") String state,
-                                        @RequestHeader(USER_ID) Long userId) {
+                                        @RequestHeader(USER_ID) Long userId,
+                                        @RequestParam(defaultValue = "0") Integer from,
+                                        @RequestParam(required = false) Integer size) {
         log.info("Получен GET-запрос к эндпоинту: '/bookings' на получение " +
                 "списка всех бронирований пользователя с ID={} с параметром STATE={}", userId, state);
-        return service.getBookings(state, userId);
+        return service.getBookings(state, userId, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getBookingsOwner(@RequestParam(name = "state", defaultValue = "ALL") String state,
-                                             @RequestHeader(USER_ID) Long userId) {
+                                             @RequestHeader(USER_ID) Long userId,
+                                             @RequestParam(defaultValue = "0") Integer from,
+                                             @RequestParam(required = false) Integer size) {
         log.info("Получен GET-запрос к эндпоинту: '/bookings/owner' на получение " +
                 "списка всех бронирований вещей пользователя с ID={} с параметром STATE={}", userId, state);
-        return service.getBookingsOwner(state, userId);
+        return service.getBookingsOwner(state, userId, from, size);
     }
 }
