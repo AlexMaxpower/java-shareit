@@ -64,14 +64,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
 
         if (size == null) {
-            pageable =
+        /*    pageable =
                     PageRequest.of(pager.getIndex(), pager.getPageSize(), sort);
             do {
                 page = repository.findAllByRequestorIdNot(userId, pageable);
                 listItemRequestDto.addAll(page.stream().map(mapper::toItemRequestDto).collect(toList()));
                 pageable = pageable.next();
-            } while (page.hasNext());
-
+            } while (page.hasNext()); */
+            List<ItemRequest> listItemRequest = repository.findAllByRequestorIdNotOrderByCreatedDesc(userId);
+            listItemRequestDto
+                    .addAll(listItemRequest.stream().skip(from).map(mapper::toItemRequestDto).collect(toList()));
         } else {
             for (int i = pager.getIndex(); i < pager.getTotalPages(); i++) {
                 pageable =
