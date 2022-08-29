@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
                     .allMatch(u -> u.getId().equals(userDto.getId()))) {
                 user.setEmail(userDto.getEmail());
             } else {
-                throw new UserAlreadyExistsException("Пользователь с E-mail=" + user.getEmail() + " уже существует!");
+                throw new UserAlreadyExistsException("Пользователь с E-mail=" + userDto.getEmail() + " уже существует!");
             }
 
         }
