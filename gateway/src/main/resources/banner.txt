@@ -1,0 +1,9 @@
+                                                     Powered by Spring Boot ${spring-boot.version}
+${AnsiColor.BRIGHT_GREEN}   _____ _                    _____ _   ${AnsiColor.MAGENTA}   _____       _
+${AnsiColor.BRIGHT_GREEN}  / ____| |                  |_   _| |  ${AnsiColor.MAGENTA}  / ____|     | |
+${AnsiColor.BRIGHT_GREEN} | (___ | |__   __ _ _ __ ___  | | | |_ ${AnsiColor.MAGENTA} | |  __  __ _| |_ _____      ____ _ _   _
+${AnsiColor.BRIGHT_GREEN}  \___ \| '_ \ / _` | '__/ _ \ | | | __|${AnsiColor.MAGENTA} | | |_ |/ _` | __/ _ \ \ __ / / _` | | | |
+${AnsiColor.BRIGHT_GREEN}  ____) | | | | (_| | | |  __/_| |_| |_ ${AnsiColor.MAGENTA} | |__| | (_| | ||  __/\ V  V / (_| | |_| |
+${AnsiColor.BRIGHT_GREEN} |_____/|_| |_|\__,_|_|  \___|_____|\__|${AnsiColor.MAGENTA}  \_____|\__,_|\__\___| \_/\_/ \__,_|\__, |
+                                                                              __/ |
+                                                                             |___/${AnsiColor.DEFAULT}
