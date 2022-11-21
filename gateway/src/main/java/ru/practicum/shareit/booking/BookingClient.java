@@ -25,33 +25,33 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getBookings(Long userId, BookingState state, Integer from, Integer size) {
+    public ResponseEntity<Object> getBookings(String authHeader, Long userId, BookingState state, Integer from, Integer size) {
         String path = "?state=" + state.name() + "&from=" + from;
         if (size != null) {
             path += "&size=" + size;
         }
-        return get(path, userId, null);
+        return get(path, userId, authHeader);
     }
 
-    public ResponseEntity<Object> getBookingsOwner(Long userId, BookingState state, Integer from, Integer size) {
+    public ResponseEntity<Object> getBookingsOwner(String authHeader, Long userId, BookingState state, Integer from, Integer size) {
         String path = "/owner?state=" + state.name() + "&from=" + from;
         if (size != null) {
             path += "&size=" + size;
         }
-        return get(path, userId, null);
+        return get(path, userId, authHeader);
     }
 
 
-    public ResponseEntity<Object> create(Long userId, BookItemRequestDto requestDto) {
-        return post("", userId, requestDto);
+    public ResponseEntity<Object> create(String authHeader, Long userId, BookItemRequestDto requestDto) {
+        return post("", userId, requestDto, authHeader);
     }
 
-    public ResponseEntity<Object> getBooking(Long userId, Long bookingId) {
-        return get("/" + bookingId, userId);
+    public ResponseEntity<Object> getBooking(String authHeader, Long userId, Long bookingId) {
+        return get("/" + bookingId, userId, authHeader);
     }
 
-    public ResponseEntity<Object> update(Long bookingId, Long userId, Boolean approved) {
+    public ResponseEntity<Object> update(String authHeader, Long bookingId, Long userId, Boolean approved) {
         String path = "/" + bookingId + "?approved=" + approved;
-        return patch(path, userId, null, null);
+        return patch(path, userId, null, authHeader);
     }
 }

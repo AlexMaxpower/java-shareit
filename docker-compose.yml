@@ -1,32 +1,64 @@
-version: '3.8'
+version: '3.9'
 services:
   gateway:
     build: gateway
     container_name: gateway
     ports:
-      - "8080:8080"
+      - '8080:8080'
     depends_on:
       - db
       - server
     environment:
       - SHAREIT_SERVER_URL=http://server:9090
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://auth:8180/realms/shareit-realm/protocol/openid-connect/certs
 
   server:
     build: server
     container_name: server
     ports:
-      - "9090:9090"
+      - '9090:9090'
     depends_on:
-         - db
+      auth:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
+      - KEYCLOAK_AUTH_SERVER_URL=http://auth:8180
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://auth:8180/realms/shareit-realm/protocol/openid-connect/certs
 
   db:
     image: postgres:13.7-alpine
     container_name: db
     ports:
-      - "6541:5432"
+      - '6541:5432'
     environment:
       - POSTGRES_DB=shareit
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=sharer
+      - POSTGRES_PASSWORD=Ilikeshare
+
+  auth:
+    container_name: auth
+    image: quay.io/keycloak/keycloak:20.0.1
+    
+    volumes:
+      - ./import:/opt/keycloak/data/import
+    
+    command:
+      - start-dev
+      - --http-port=8180
+      - --hostname-url=http://localhost:8180
+      - --import-realm
+    # export realms with users -> kc.bat export --dir .\ --users realm_file     
+    
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://localhost:8180/auth/realms/shareit-realm"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      
+    ports:
+      - '8180:8180'

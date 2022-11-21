@@ -19,39 +19,44 @@ import javax.validation.constraints.PositiveOrZero;
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
     private static final String USER_ID = "X-Sharer-User-Id";
+    private static final String AUTH = "Authorization";
     private final ItemRequestClient itemRequestClient;
 
     @ResponseBody
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody @Valid ItemRequestDto itemRequestDto,
+    public ResponseEntity<Object> create(@RequestHeader(AUTH) String authHeader,
+                                         @RequestBody @Valid ItemRequestDto itemRequestDto,
                                          @RequestHeader(USER_ID) Long requestorId) {
         log.info("Получен POST-запрос к эндпоинту: '/requests' " +
                 "на создание запроса вещи от пользователя с ID={}", requestorId);
-        return itemRequestClient.create(itemRequestDto, requestorId);
+        return itemRequestClient.create(authHeader, itemRequestDto, requestorId);
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<Object> getItemRequestById(@PathVariable("requestId") Long itemRequestId,
+    public ResponseEntity<Object> getItemRequestById(@RequestHeader(AUTH) String authHeader,
+                                                     @PathVariable("requestId") Long itemRequestId,
                                                      @RequestHeader(USER_ID) Long userId) {
         log.info("Получен GET-запрос к эндпоинту: '/requests' на получение запроса с ID={}", itemRequestId);
-        return itemRequestClient.getItemRequestById(userId, itemRequestId);
+        return itemRequestClient.getItemRequestById(authHeader, userId, itemRequestId);
     }
 
 
     @GetMapping
-    public ResponseEntity<Object> getOwnItemRequests(@RequestHeader(USER_ID) Long userId) {
+    public ResponseEntity<Object> getOwnItemRequests(@RequestHeader(AUTH) String authHeader,
+                                                     @RequestHeader(USER_ID) Long userId) {
         log.info("Получен GET-запрос к эндпоинту: '/requests' на получение запросов пользователя ID={}",
                 userId);
-        return itemRequestClient.getOwnItemRequests(userId);
+        return itemRequestClient.getOwnItemRequests(authHeader, userId);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllItemRequests(@RequestHeader(USER_ID) Long userId,
+    public ResponseEntity<Object> getAllItemRequests(@RequestHeader(AUTH) String authHeader,
+                                                     @RequestHeader(USER_ID) Long userId,
                                                      @PositiveOrZero @RequestParam(name = "from", defaultValue = "0")
                                                      Integer from,
                                                      @RequestParam(required = false) Integer size) {
         log.info("Получен GET-запрос к эндпоинту: '/requests/all' от пользователя с ID={} на получение всех запросов",
                 userId);
-        return itemRequestClient.getAllItemRequests(userId, from, size);
+        return itemRequestClient.getAllItemRequests(authHeader, userId, from, size);
     }
 }
