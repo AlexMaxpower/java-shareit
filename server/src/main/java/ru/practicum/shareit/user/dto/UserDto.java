@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,4 +11,6 @@ public class UserDto {
     private String name;
     private String email;
     private String password;
+    @JsonIgnore
+    private String uuid;
 }
