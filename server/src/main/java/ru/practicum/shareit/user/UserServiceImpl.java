@@ -1,26 +1,32 @@
 package ru.practicum.shareit.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.UserAlreadyExistsException;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.keycloak.KeycloakUtils;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserKeycloakDto;
 
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final KeycloakUtils keycloakUtils;
 
     @Autowired
-    public UserServiceImpl(UserRepository repository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository repository, UserMapper userMapper, KeycloakUtils keycloakUtils) {
         this.repository = repository;
         this.mapper = userMapper;
+        this.keycloakUtils = keycloakUtils;
     }
 
     @Override
@@ -38,6 +44,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(UserDto userDto) {
+        if (userDto.getPassword() == null) {
+            userDto.setPassword("password");
+        }
+        UserKeycloakDto userKeycloakDto = keycloakUtils.createKeycloakUser(userDto);
+        userDto.setUuid(userKeycloakDto.getId());
         try {
             return mapper.toUserDto(repository.save(mapper.toUser(userDto)));
         } catch (DataIntegrityViolationException e) {
@@ -67,11 +78,20 @@ public class UserServiceImpl implements UserService {
             }
 
         }
+
+        UserDto updateUserDto = mapper.toUserDto(user);
+        if (userDto.getPassword() != null) {
+            updateUserDto.setPassword(userDto.getPassword());
+        }
+        keycloakUtils.updateKeycloakUser(updateUserDto);
         return mapper.toUserDto(repository.save(user));
     }
 
     @Override
     public void delete(Long userId) {
+       String uuid = findUserById(userId).getUuid();
+       keycloakUtils.deleteKeycloakUser(uuid);
+
         try {
             repository.deleteById(userId);
         } catch (EmptyResultDataAccessException e) {

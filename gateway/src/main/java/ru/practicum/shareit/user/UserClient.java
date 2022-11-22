@@ -24,23 +24,23 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> create(UserDto userDto) {
-        return post("", userDto);
+    public ResponseEntity<Object> create(String authHeader, UserDto userDto) {
+        return post("", userDto, authHeader);
     }
 
-    public ResponseEntity<Object> getUserById(Long userId) {
-        return get("/" + userId);
+    public ResponseEntity<Object> getUserById(String authHeader, Long userId) {
+        return get("/" + userId, authHeader);
     }
 
-    public ResponseEntity<Object> getUsers() {
-        return get("");
+    public ResponseEntity<Object> getUsers(String authHeader) {
+        return get("", authHeader);
     }
 
-    public ResponseEntity<Object> update(UserDto userDto, Long userId) {
-        return patch("/" + userId, userDto);
+    public ResponseEntity<Object> update(String authHeader, UserDto userDto, Long userId) {
+        return patch("/" + userId, userDto, authHeader);
     }
 
-    public ResponseEntity<Object> delete(Long userId) {
-        return delete("/" + userId);
+    public ResponseEntity<Object> delete(String authHeader, Long userId) {
+        return delete("/" + userId, authHeader);
     }
 }

@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -30,13 +31,15 @@ public class UserController {
 
     @ResponseBody
     @PostMapping
+    @PreAuthorize("hasRole('user')")
     public UserDto create(@RequestBody UserDto userDto) {
-        log.info("Получен POST-запрос к эндпоинту: '/users' на добавление пользователя");
+        log.info("Получен POST-запрос к эндпоинту: '/users' на добавление пользователя с UserDto={}", userDto);
         return userService.create(userDto);
     }
 
     @ResponseBody
     @PatchMapping("/{userId}")
+    @PreAuthorize("hasRole('user')")
     public UserDto update(@RequestBody UserDto userDto, @PathVariable Long userId) {
         log.info("Получен PATCH-запрос к эндпоинту: '/users' на обновление пользователя с ID={}", userId);
         return userService.update(userDto, userId);

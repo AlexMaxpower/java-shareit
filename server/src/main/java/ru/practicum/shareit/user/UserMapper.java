@@ -9,15 +9,18 @@ public class UserMapper {
         return new UserDto(
                 user.getId(),
                 user.getName(),
-                user.getEmail()
+                user.getEmail(),
+                null,
+                user.getUuid()
         );
     }
 
     public User toUser(UserDto userDto) {
-       return new User(
+        return new User(
                 userDto.getId(),
                 userDto.getName(),
-                userDto.getEmail()
+                userDto.getEmail(),
+                userDto.getUuid()
         );
     }
 }

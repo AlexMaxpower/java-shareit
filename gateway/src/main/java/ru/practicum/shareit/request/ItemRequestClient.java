@@ -24,23 +24,24 @@ public class ItemRequestClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> create(ItemRequestDto requestDto, Long requestorId) {
-        return post("", requestorId, requestDto);
+    public ResponseEntity<Object> create(String authHeader,
+                                         ItemRequestDto requestDto, Long requestorId) {
+        return post("", requestorId, requestDto, authHeader);
     }
 
-    public ResponseEntity<Object> getItemRequestById(Long userId, Long requestId) {
-        return get("/" + requestId, userId);
+    public ResponseEntity<Object> getItemRequestById(String authHeader, Long userId, Long requestId) {
+        return get("/" + requestId, userId, authHeader);
     }
 
-    public ResponseEntity<Object> getOwnItemRequests(Long userId) {
-        return get("", userId);
+    public ResponseEntity<Object> getOwnItemRequests(String authHeader, Long userId) {
+        return get("", userId, authHeader);
     }
 
-    public ResponseEntity<Object> getAllItemRequests(Long userId, Integer from, Integer size) {
+    public ResponseEntity<Object> getAllItemRequests(String authHeader, Long userId, Integer from, Integer size) {
         String path = "/all" + "?from=" + from;
         if (size != null) {
             path += "&size=" + size;
         }
-        return get(path, userId, null);
+        return get(path, userId, authHeader);
     }
 }

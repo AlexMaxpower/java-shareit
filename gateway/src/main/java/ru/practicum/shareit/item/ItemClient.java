@@ -25,39 +25,39 @@ public class ItemClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> create(Long userId, ItemDto itemDto) {
-        return post("", userId, itemDto);
+    public ResponseEntity<Object> create(String authHeader, Long userId, ItemDto itemDto) {
+        return post("", userId, itemDto, authHeader);
     }
 
-    public ResponseEntity<Object> getItemById(Long userId, Long itemId) {
-        return get("/" + itemId, userId);
+    public ResponseEntity<Object> getItemById(String authHeader, Long userId, Long itemId) {
+        return get("/" + itemId, userId, authHeader);
     }
 
-    public ResponseEntity<Object> getItemsByOwner(Long userId, Integer from, Integer size) {
+    public ResponseEntity<Object> getItemsByOwner(String authHeader, Long userId, Integer from, Integer size) {
         String path = "?from=" + from;
         if (size != null) {
             path += "&size=" + size;
         }
-        return get(path, userId);
+        return get(path, userId, authHeader);
     }
 
-    public ResponseEntity<Object> update(ItemDto itemDto, Long itemId, Long userId) {
-        return patch("/" + itemId, userId, itemDto);
+    public ResponseEntity<Object> update(String authHeader, ItemDto itemDto, Long itemId, Long userId) {
+        return patch("/" + itemId, userId, itemDto, authHeader);
     }
 
-    public ResponseEntity<Object> delete(Long itemId, Long userId) {
-        return delete("/" + itemId, userId);
+    public ResponseEntity<Object> delete(String authHeader, Long itemId, Long userId) {
+        return delete("/" + itemId, userId, authHeader);
     }
 
-    public ResponseEntity<Object> getItemsBySearchQuery(String text, Integer from, Integer size) {
+    public ResponseEntity<Object> getItemsBySearchQuery(String authHeader, String text, Integer from, Integer size) {
         String path = "/search?text=" + text + "&from=" + from;
         if (size != null) {
             path += "&size=" + size;
         }
-        return get(path);
+        return get(path, authHeader);
     }
 
-    public ResponseEntity<Object> createComment(CommentDto commentDto, Long itemId, Long userId) {
-        return post("/" + itemId + "/comment", userId, commentDto);
+    public ResponseEntity<Object> createComment(String authHeader, CommentDto commentDto, Long itemId, Long userId) {
+        return post("/" + itemId + "/comment", userId, commentDto, authHeader);
     }
 }
