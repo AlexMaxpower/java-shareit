@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.kafka.Sender;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,19 +22,16 @@ public class UserController {
 
     private static final String AUTH = "Authorization";
     private final UserClient userClient;
-    private final Sender sender;
 
     @GetMapping
     public ResponseEntity<Object> getUsers(@RequestHeader(AUTH) String authHeader,
                                            HttpServletRequest request, Authentication authentication) {
-        sender.sendMessage(request, authentication);
         return userClient.getUsers(authHeader);
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<Object> getUserById(@RequestHeader(AUTH) String authHeader, @PathVariable Long userId,
                                               HttpServletRequest request, Authentication authentication) {
-        sender.sendMessage(request, authentication);
         return userClient.getUserById(authHeader, userId);
     }
 
@@ -45,7 +41,6 @@ public class UserController {
     public ResponseEntity<Object> create(@RequestHeader(AUTH) String authHeader, @Valid @RequestBody UserDto userDto,
                                          HttpServletRequest request, Authentication authentication) {
         log.info("Получен POST-запрос к эндпоинту: '/users' на добавление пользователя с UserDto={}", userDto);
-        sender.sendMessage(request, authentication);
         return userClient.create(authHeader, userDto);
     }
 
@@ -55,7 +50,6 @@ public class UserController {
                                          @PathVariable Long userId, HttpServletRequest request,
                                          Authentication authentication) {
         log.info("Получен PATCH-запрос к эндпоинту: '/users' на обновление пользователя с ID={}", userId);
-        sender.sendMessage(request, authentication);
         return userClient.update(authHeader, userDto, userId);
     }
 
@@ -63,7 +57,6 @@ public class UserController {
     public ResponseEntity<Object> delete(@RequestHeader(AUTH) String authHeader, @PathVariable Long userId,
                                          HttpServletRequest request, Authentication authentication) {
         log.info("Получен DELETE-запрос к эндпоинту: '/users' на удаление пользователя с ID={}", userId);
-        sender.sendMessage(request, authentication);
         return userClient.delete(authHeader, userId);
     }
 }

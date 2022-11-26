@@ -9,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.kafka.Sender;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -24,7 +23,6 @@ public class ItemController {
     private static final String USER_ID = "X-Sharer-User-Id";
     private static final String AUTH = "Authorization";
     private final ItemClient itemClient;
-    private final Sender sender;
 
     @GetMapping
     public ResponseEntity<Object> getItemsByOwner(@RequestHeader(AUTH) String authHeader,
@@ -33,7 +31,6 @@ public class ItemController {
                                                   @RequestParam(required = false) Integer size,
                                                   HttpServletRequest request, Authentication authentication) {
         log.info("Получен GET-запрос к эндпоинту: '/items' на получение всех вещей владельца с ID={}", ownerId);
-        sender.sendMessage(request, authentication);
         return itemClient.getItemsByOwner(authHeader, ownerId, from, size);
     }
 
@@ -43,7 +40,6 @@ public class ItemController {
                                          @RequestBody @Valid ItemDto itemDto,
                                          HttpServletRequest request, Authentication authentication) {
         log.info("Создание вещи {}, userId={}", itemDto, userId);
-        sender.sendMessage(request, authentication);
         return itemClient.create(authHeader, userId, itemDto);
     }
 
@@ -53,7 +49,6 @@ public class ItemController {
                                               @PathVariable Long itemId,
                                               HttpServletRequest request, Authentication authentication) {
         log.info("Запрос вещи {}, userId={}", itemId, userId);
-        sender.sendMessage(request, authentication);
         return itemClient.getItemById(authHeader, userId, itemId);
     }
 
@@ -64,7 +59,6 @@ public class ItemController {
                                          @RequestHeader(USER_ID) Long userId,
                                          HttpServletRequest request, Authentication authentication) {
         log.info("Получен PATCH-запрос к эндпоинту: '/items' на обновление вещи с ID={}", itemId);
-        sender.sendMessage(request, authentication);
         return itemClient.update(authHeader, itemDto, itemId, userId);
     }
 
@@ -73,7 +67,6 @@ public class ItemController {
                                          @PathVariable Long itemId, @RequestHeader(USER_ID) Long ownerId,
                                          HttpServletRequest request, Authentication authentication) {
         log.info("Получен DELETE-запрос к эндпоинту: '/items' на удаление вещи с ID={}", itemId);
-        sender.sendMessage(request, authentication);
         return itemClient.delete(authHeader, itemId, ownerId);
     }
 
@@ -84,7 +77,6 @@ public class ItemController {
                                                         @RequestParam(required = false) Integer size,
                                                         HttpServletRequest request, Authentication authentication) {
         log.info("Получен GET-запрос к эндпоинту: '/items/search' на поиск вещи с текстом={}", text);
-        sender.sendMessage(request, authentication);
         return itemClient.getItemsBySearchQuery(authHeader, text, from, size);
     }
 
@@ -97,7 +89,6 @@ public class ItemController {
                                                 HttpServletRequest request, Authentication authentication) {
         log.info("Получен POST-запрос к эндпоинту: '/items/comment' на" +
                 " добавление отзыва пользователем с ID={}", userId);
-        sender.sendMessage(request, authentication);
         return itemClient.createComment(authHeader, commentDto, itemId, userId);
     }
 }
