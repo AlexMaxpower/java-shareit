@@ -7,7 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.kafka.Sender;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +23,6 @@ public class ItemRequestController {
     private static final String USER_ID = "X-Sharer-User-Id";
     private static final String AUTH = "Authorization";
     private final ItemRequestClient itemRequestClient;
-    private final Sender sender;
 
     @ResponseBody
     @PostMapping
@@ -34,7 +32,6 @@ public class ItemRequestController {
                                          HttpServletRequest request, Authentication authentication) {
         log.info("Получен POST-запрос к эндпоинту: '/requests' " +
                 "на создание запроса вещи от пользователя с ID={}", requestorId);
-        sender.sendMessage(request, authentication);
         return itemRequestClient.create(authHeader, itemRequestDto, requestorId);
     }
 
@@ -44,7 +41,6 @@ public class ItemRequestController {
                                                      @RequestHeader(USER_ID) Long userId,
                                                      HttpServletRequest request, Authentication authentication) {
         log.info("Получен GET-запрос к эндпоинту: '/requests' на получение запроса с ID={}", itemRequestId);
-        sender.sendMessage(request, authentication);
         return itemRequestClient.getItemRequestById(authHeader, userId, itemRequestId);
     }
 
@@ -55,7 +51,6 @@ public class ItemRequestController {
                                                      HttpServletRequest request, Authentication authentication) {
         log.info("Получен GET-запрос к эндпоинту: '/requests' на получение запросов пользователя ID={}",
                 userId);
-        sender.sendMessage(request, authentication);
         return itemRequestClient.getOwnItemRequests(authHeader, userId);
     }
 
@@ -68,7 +63,6 @@ public class ItemRequestController {
                                                      HttpServletRequest request, Authentication authentication) {
         log.info("Получен GET-запрос к эндпоинту: '/requests/all' от пользователя с ID={} на получение всех запросов",
                 userId);
-        sender.sendMessage(request, authentication);
         return itemRequestClient.getAllItemRequests(authHeader, userId, from, size);
     }
 }
